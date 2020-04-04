@@ -8,7 +8,7 @@ import cn.mybop.redisclient.common.Constants;
 import cn.mybop.redisclient.common.Utils;
 import redis.clients.jedis.JedisPoolConfig;
 
-public class SentinelRedisClient extends RedisClientImpl {
+public class SentinelRedisClient extends AdvancedRedisClient {
 	
 	public SentinelRedisClient(Properties props) {
 		super(props);

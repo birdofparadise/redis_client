@@ -25,7 +25,7 @@ import redis.clients.jedis.Tuple;
 import redis.clients.util.Hashing;
 import redis.clients.util.MurmurHash;
 
-public class SharedRedisClient extends LifecycleBase implements IRedisClient {
+public class SharedClient extends LifecycleBase implements IRedisClient {
 	
 	private TreeMap<Long, IRedisClient> nodes;
 	
@@ -39,7 +39,7 @@ public class SharedRedisClient extends LifecycleBase implements IRedisClient {
 	
 	private String name;
 	
-	public SharedRedisClient(Properties props) {
+	public SharedClient(Properties props) {
 		this.props = props;
 	}
 	

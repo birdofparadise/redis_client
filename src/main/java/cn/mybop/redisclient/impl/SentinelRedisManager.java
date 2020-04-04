@@ -11,7 +11,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisSentinelPool;
 
-public class SentinelRedisManager extends RedisManagerImpl {
+public class SentinelRedisManager extends AdvancedRedisManager {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SentinelRedisManager.class);
 	

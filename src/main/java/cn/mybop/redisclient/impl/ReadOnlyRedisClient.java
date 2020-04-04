@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import cn.mybop.redisclient.RedisException;
 
-public class ReadOnlyRedisClient extends RedisClientImpl {
+public class ReadOnlyRedisClient extends AdvancedRedisClient {
 	
 	public ReadOnlyRedisClient(Properties props) {
 		super(props);

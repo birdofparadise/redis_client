@@ -89,8 +89,8 @@ public class SentinelManager extends AbstractRedisManager {
 		}
 		jedisSentinelPool = new JedisSentinelPool(masterName, sentinelSet, getPoolConfig(), getTimeout(), getPassword(), getDatabase());
 
-		if (LOGGER.isErrorEnabled()) {
-			LOGGER.error("sentinel服务器[" + sentinels + "-" + masterName + "]启动完成");
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("sentinel服务器[" + sentinels + "-" + masterName + "]启动完成");
 		}
 	}
 

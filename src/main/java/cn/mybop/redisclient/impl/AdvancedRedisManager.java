@@ -20,9 +20,9 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-public class RedisManagerImpl extends AbstractRedisManager {
+public class AdvancedRedisManager extends AbstractRedisManager {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(RedisManagerImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AdvancedRedisManager.class);
 	//全量服务列表
 	private String servers;
 	
@@ -36,7 +36,7 @@ public class RedisManagerImpl extends AbstractRedisManager {
 	
 	private ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 	
-	public RedisManagerImpl(String servers, JedisPoolConfig poolConfig, int timeout, final String password, final int database, String loadBalancer) {
+	public AdvancedRedisManager(String servers, JedisPoolConfig poolConfig, int timeout, final String password, final int database, String loadBalancer) {
 		super(poolConfig, timeout, password, database);
 		this.servers = servers;
 		if (Constants.Loadbalancer.ROUNDROBIN.equalsIgnoreCase(loadBalancer)) {

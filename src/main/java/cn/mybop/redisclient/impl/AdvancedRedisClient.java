@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import cn.mybop.redisclient.RedisException;
 import cn.mybop.redisclient.RedisManager;
+import cn.mybop.redisclient.check.CheckTask;
 import cn.mybop.redisclient.check.ICheckTask;
 import cn.mybop.redisclient.common.Constants;
 import cn.mybop.redisclient.common.Utils;
@@ -19,13 +20,13 @@ import cn.mybop.redisclient.serialization.ISerializable;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPoolConfig;
 
-public abstract class RedisClientImpl extends AbstractRedisClient {
+public abstract class AdvancedRedisClient extends AbstractRedisClient {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(RedisClientImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AdvancedRedisClient.class);
 	
 	private ScheduledExecutorService executor;
 	
-	public RedisClientImpl(Properties props) {
+	public AdvancedRedisClient(Properties props) {
 		super(props);
 	}
 	
@@ -37,12 +38,12 @@ public abstract class RedisClientImpl extends AbstractRedisClient {
 			loadBalancer = props.getProperty(Constants.SERVER_LOADBALANCER);
 		}
 		JedisPoolConfig poolConfig = Utils.initPoolConfig(props);
-		return new RedisManagerImpl(servers, poolConfig, getTimeout(), getPassword(), getDatabase(), loadBalancer);
+		return new AdvancedRedisManager(servers, poolConfig, getTimeout(), getPassword(), getDatabase(), loadBalancer);
 	}
 	
 	public ICheckTask initCheckTask() {
 		Properties props = getProps();
-		Class taskClazz = ICheckTask.class;		
+		Class taskClazz = CheckTask.class;		
 		if (Utils.isNotBlank(props.getProperty(Constants.CHECK_TASK))) {
 			try {
 				taskClazz = Class.forName(props.getProperty(Constants.CHECK_TASK));

@@ -73,8 +73,8 @@ public class CheckTask extends AbstractCheckTask {
 			try {
 				jedis = manager.getJedis(server);
 				if (checkPing(jedis) && checkValidate(jedis)) {
-					if (LOGGER.isErrorEnabled()) {
-						LOGGER.error("redis[" + server + "]检查通过 加入可用列表");
+					if (LOGGER.isInfoEnabled()) {
+						LOGGER.info("redis[" + server + "]检查通过 加入可用列表");
 					}
 					manager.addJedisPool(server);
 					continue;

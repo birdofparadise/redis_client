@@ -15,7 +15,7 @@ import cn.mybop.redisclient.common.Utils;
 import cn.mybop.redisclient.impl.ReadOnlyRedisClient;
 import cn.mybop.redisclient.impl.SentinelClient;
 import cn.mybop.redisclient.impl.SentinelRedisClient;
-import cn.mybop.redisclient.impl.SharedRedisClient;
+import cn.mybop.redisclient.impl.SharedClient;
 import cn.mybop.redisclient.impl.WriteAllReadAnyRedisClient;
 
 public class RedisClientFactory {
@@ -102,7 +102,7 @@ public class RedisClientFactory {
 		} else if (Constants.CLIENT_TYPE_WRITEALLREADANY.equalsIgnoreCase(clientType)) {
 			client = new WriteAllReadAnyRedisClient(props);
 		} else if (Constants.CLIENT_TYPE_SHARED.equalsIgnoreCase(clientType)) {
-			client = new SharedRedisClient(props);
+			client = new SharedClient(props);
 		}
 		
 		if (client == null) {

@@ -21,7 +21,7 @@ import redis.clients.jedis.Tuple;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 
-public class WriteAllReadAnyRedisClient extends RedisClientImpl {
+public class WriteAllReadAnyRedisClient extends AdvancedRedisClient {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(WriteAllReadAnyRedisClient.class);
 	
@@ -31,6 +31,11 @@ public class WriteAllReadAnyRedisClient extends RedisClientImpl {
 	
 	public WriteAllReadAnyRedisClient(Properties props) {
 		super(props);
+		if (Utils.isNotBlank(props.getProperty(Constants.WRITEALL_THROW_EXCEPTION_WHEN_WRITE_ERROR))) {
+			throwExceptionWhenWriteError = Boolean.parseBoolean(props.getProperty(Constants.WRITEALL_THROW_EXCEPTION_WHEN_WRITE_ERROR));
+		} else {
+			throwExceptionWhenWriteError = Constants.DEFAULT_WRITEALL_THROW_EXCEPTION_WHEN_WRITE_ERROR;
+		}
 	}
 	
 	@Override
@@ -77,8 +82,6 @@ public class WriteAllReadAnyRedisClient extends RedisClientImpl {
 				}
 				//remove unavailable server
 				removeUnavailableServer(jedis);
-				//close jedis
-				closeJedis(jedis);
 				if (throwExceptionWhenWriteError) {
 					throw new RedisException("redis[" + server + "]操作失败", e);
 				} else {
@@ -156,8 +159,6 @@ public class WriteAllReadAnyRedisClient extends RedisClientImpl {
 				}
 				//remove unavailable server
 				removeUnavailableServer(jedis);
-				//close jedis
-				closeJedis(jedis);
 				if (throwExceptionWhenWriteError) {
 					throw new RedisException("redis[" + server + "]操作失败", e);
 				} else {
@@ -212,8 +213,6 @@ public class WriteAllReadAnyRedisClient extends RedisClientImpl {
 				}
 				//remove unavailable server
 				removeUnavailableServer(jedis);
-				//close jedis
-				closeJedis(jedis);
 				if (throwExceptionWhenWriteError) {
 					throw new RedisException("redis[" + server + "]操作失败", e);
 				} else {
