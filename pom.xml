@@ -4,22 +4,72 @@
 
   <groupId>cn.mybop</groupId>
   <artifactId>redisclient</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <packaging>jar</packaging>
 
   <name>redisclient</name>
-  <url>http://maven.apache.org</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    
+    <junit.version>3.8.1</junit.version>
+    <slf4j.version>1.7.25</slf4j.version>
+    <logback.version>1.2.3</logback.version>
+    <jedis.version>2.9.2</jedis.version>
+    <hessian.version>4.0.38</hessian.version>
+    <fastjson.version>1.2.62</fastjson.version>
   </properties>
 
   <dependencies>
+  	<dependency>
+	    <groupId>redis.clients</groupId>
+	    <artifactId>jedis</artifactId>
+	    <version>${jedis.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>com.caucho</groupId>
+	    <artifactId>hessian</artifactId>
+	    <version>${hessian.version}</version>
+	    <scope>provider</scope>
+	</dependency>	
+	<dependency>
+	    <groupId>com.alibaba</groupId>
+	    <artifactId>fastjson</artifactId>
+	    <version>${fastjson.version}</version>
+	    <scope>provider</scope>
+	</dependency>
+  	
+  	<!-- slf4j -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+    </dependency>
+
+    <!-- logback -->
+    <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>${logback.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-access</artifactId>
+        <version>${logback.version}</version>
+    </dependency>
+    
+    <dependency>
+	    <groupId>junit</groupId>
+	    <artifactId>junit</artifactId>
+	    <version>${junit.version}</version>
+	    <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
