@@ -2,6 +2,7 @@ package cn.mybop.redisclient.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +14,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import cn.mybop.redisclient.IRedisClient;
-import cn.mybop.redisclient.RedisClientFactory;
 import cn.mybop.redisclient.RedisException;
 import cn.mybop.redisclient.RedisManager;
 import cn.mybop.redisclient.common.Constants;
@@ -29,7 +29,7 @@ public class SharedClient extends LifecycleBase implements IRedisClient {
 	
 	private TreeMap<Long, IRedisClient> nodes;
 	
-	private Map<String, IRedisClient> clients;
+	private List<IRedisClient> clients;
 	
 	private Hashing algo;
 	
@@ -39,8 +39,9 @@ public class SharedClient extends LifecycleBase implements IRedisClient {
 	
 	private String name;
 	
-	public SharedClient(Properties props) {
+	public SharedClient(Properties props, List<IRedisClient> clients) {
 		this.props = props;
+		this.clients = clients;
 	}
 	
 	@Override
@@ -49,11 +50,6 @@ public class SharedClient extends LifecycleBase implements IRedisClient {
 		name = props.getProperty(Constants.CLIENT_NAME);
 		if (Utils.isBlank(name)) {
 			throw new RedisException(Constants.CLIENT_NAME + "参数未定义");
-		}
-				
-		String strSharedClients = props.getProperty(Constants.SHARED_CLIENT_LIST);
-		if (Utils.isBlank(strSharedClients)) {
-			throw new RedisException(Constants.SHARED_CLIENT_LIST + "参数为空");
 		}
 		
 		String shareAlgorithm = props.getProperty(Constants.SHARED_ALGORITHM, Constants.DEFAULT_SHARED_ALGORITHM);
@@ -71,31 +67,24 @@ public class SharedClient extends LifecycleBase implements IRedisClient {
 		}
 		
 		nodes = new TreeMap<Long, IRedisClient>();
-		clients = new HashMap<String, IRedisClient>();
-		String[] sharedClients = strSharedClients.split(",");
-		for (int i = 0; i < sharedClients.length; i++) {
-			Properties clientProps = new Properties();
-			clientProps.putAll(props);
-			clientProps.putAll(RedisClientFactory.getProperties(sharedClients[i]));
-			//不允许shared redis client再嵌套shared redis client
-			String clientType = clientProps.getProperty(Constants.CLIENT_TYPE);
-			if (Utils.isNotBlank(clientType) && Constants.CLIENT_TYPE_SHARED.equalsIgnoreCase(clientType)) {
+		for (int i = 0; i < clients.size(); i++) {
+			IRedisClient redisClient = clients.get(i);
+			if (redisClient instanceof SharedClient) {
 				throw new RedisException("不允许shared redis client再嵌套shared redis client");
 			}
-			IRedisClient redisClient = RedisClientFactory.getClient(clientProps);
 			for (int n = 0; n < sharedNode; n++) {
 				nodes.put(algo.hash("SHARD-" + i + "-NODE-" + n), redisClient);
 			}
-			clients.put(redisClient.getName(), redisClient);
 		}
 	}
 	
 	@Override
 	protected void stopInternal() {
 		nodes.clear();
-		for (Entry<String, IRedisClient> entry : clients.entrySet()) {
-			if (entry.getValue() != null) {
-				entry.getValue().stop();
+		for (Iterator<IRedisClient> iter = clients.iterator(); iter.hasNext(); ) {
+			IRedisClient redisClient = iter.next();
+			if (redisClient != null) {
+				redisClient.stop();
 			}
 		}
 		clients.clear();
@@ -262,8 +251,9 @@ public class SharedClient extends LifecycleBase implements IRedisClient {
 	@Override
 	public String flushDB() {
 		StringBuilder sb = new StringBuilder();
-		for (Entry<String, IRedisClient> entry : clients.entrySet()) {
-			sb.append(entry.getKey()).append("=").append(entry.getValue().flushDB()).append(System.getProperty("line.separator"));
+		for (Iterator<IRedisClient> iter = clients.iterator(); iter.hasNext(); ) {
+			IRedisClient redisClient = iter.next();
+			sb.append(redisClient.getName()).append("=").append(redisClient.flushDB()).append(System.getProperty("line.separator"));
 		}
 		return sb.toString();
 	}
@@ -271,8 +261,9 @@ public class SharedClient extends LifecycleBase implements IRedisClient {
 	@Override
 	public Long dbSize() {
 		long totalSize = 0l;
-		for (Entry<String, IRedisClient> entry : clients.entrySet()) {
-			totalSize += entry.getValue().dbSize();
+		for (Iterator<IRedisClient> iter = clients.iterator(); iter.hasNext(); ) {
+			IRedisClient redisClient = iter.next();
+			totalSize += redisClient.dbSize();
 		}
 		return Long.valueOf(totalSize);
 	}
@@ -280,8 +271,9 @@ public class SharedClient extends LifecycleBase implements IRedisClient {
 	@Override
 	public String info(String section) {
 		StringBuilder sb = new StringBuilder();
-		for (Entry<String, IRedisClient> entry : clients.entrySet()) {
-			sb.append(entry.getKey()).append("=").append(entry.getValue().info(section)).append(System.getProperty("line.separator"));
+		for (Iterator<IRedisClient> iter = clients.iterator(); iter.hasNext(); ) {
+			IRedisClient redisClient = iter.next();
+			sb.append(redisClient.getName()).append("=").append(redisClient.info(section)).append(System.getProperty("line.separator"));
 		}
 		return sb.toString();
 	}
@@ -289,8 +281,9 @@ public class SharedClient extends LifecycleBase implements IRedisClient {
 	@Override
 	public String info() {
 		StringBuilder sb = new StringBuilder();
-		for (Entry<String, IRedisClient> entry : clients.entrySet()) {
-			sb.append(entry.getKey()).append("=").append(entry.getValue().info()).append(System.getProperty("line.separator"));
+		for (Iterator<IRedisClient> iter = clients.iterator(); iter.hasNext(); ) {
+			IRedisClient redisClient = iter.next();
+			sb.append(redisClient.getName()).append("=").append(redisClient.info()).append(System.getProperty("line.separator"));
 		}
 		return sb.toString();
 	}
