@@ -61,7 +61,7 @@ public class WriteAllReadAnyRedisClient extends AdvancedRedisClient {
 		} catch (IOException e) {
 			throw new RedisException("压缩字节数组失败", e);
 		}
-		if (maxByteSize > 0 && value.length >= maxByteSize) {
+		if (maxByteSize > 0 && bytes.length >= maxByteSize) {
 			throw new RedisException("不能超过" + maxByteSize + "字节");
 		}
 		String btn = FAILURE;
