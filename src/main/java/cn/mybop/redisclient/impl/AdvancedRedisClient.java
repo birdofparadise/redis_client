@@ -24,7 +24,7 @@ public abstract class AdvancedRedisClient extends AbstractRedisClient {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(AdvancedRedisClient.class);
 	
-	private ScheduledExecutorService executor;
+	private ScheduledExecutorService scheduledExecutor;
 	
 	public AdvancedRedisClient(Properties props) {
 		super(props);
@@ -82,7 +82,7 @@ public abstract class AdvancedRedisClient extends AbstractRedisClient {
 		if (Utils.isNotBlank(props.getProperty(Constants.CHECK_SCHEDULE_DELAY))) {
 			delay = Long.parseLong(props.getProperty(Constants.CHECK_SCHEDULE_DELAY));
 		}
-		executor = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+		scheduledExecutor = Executors.newScheduledThreadPool(1, new ThreadFactory() {
 
 			@Override
 			public Thread newThread(Runnable r) {
@@ -93,14 +93,14 @@ public abstract class AdvancedRedisClient extends AbstractRedisClient {
 			}
 			
 		});
-		executor.scheduleWithFixedDelay(checkTask, initialDelay, delay, TimeUnit.SECONDS);
+		scheduledExecutor.scheduleWithFixedDelay(checkTask, initialDelay, delay, TimeUnit.SECONDS);
 	}
 
 	@Override
 	protected void stopInternal() {
-		if (executor != null) {
-			executor.shutdown();
-			executor = null;
+		if (scheduledExecutor != null) {
+			scheduledExecutor.shutdown();
+			scheduledExecutor = null;
 		}
 		super.stopInternal();
 	}

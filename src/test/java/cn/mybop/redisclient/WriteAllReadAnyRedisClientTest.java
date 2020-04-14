@@ -25,6 +25,7 @@ public class WriteAllReadAnyRedisClientTest extends TestCase {
 		props.put("server.loadBalancer", "random");
 		props.put("client.type", "writeallreadany");
 		props.put("client.name", "writeallreadany");
+		props.put("writeall.thread.pool", "3;5;2000;900");
 		return RedisClientFactory.getClient(props);
 	}
 	

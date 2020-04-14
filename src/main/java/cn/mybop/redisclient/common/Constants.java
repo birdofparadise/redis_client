@@ -128,6 +128,8 @@ public interface Constants {
 	
 	public final static boolean DEFAULT_WRITEALL_THROW_EXCEPTION_WHEN_WRITE_ERROR = false;
 	
+	public static final String WRITEALL_THREAD_POOL = "writeall.thread.pool";
+	
 	public final static String REPLY_CODE_OK = "OK";
 	
 }
