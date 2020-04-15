@@ -130,6 +130,10 @@ public interface Constants {
 	
 	public static final String WRITEALL_THREAD_POOL = "writeall.thread.pool";
 	
+	public final static String WRITEALL_ASYNC_WRITE = "writeall.async.write";
+	
+	public final static boolean DEFAULT_WRITEALL_ASYNC_WRITE = false;
+	
 	public final static String REPLY_CODE_OK = "OK";
 	
 }

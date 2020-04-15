@@ -34,12 +34,12 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 public class WriteAllReadAnyRedisClient extends AdvancedRedisClient {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(WriteAllReadAnyRedisClient.class);
-	
-	private final static String FAILURE = "failure";
-	
+		
 	private ExecutorService executor;
 	
 	private boolean throwExceptionWhenWriteError;
+	
+	private boolean asyncWrite;
 	
 	public WriteAllReadAnyRedisClient(Properties props) {
 		super(props);
@@ -47,6 +47,12 @@ public class WriteAllReadAnyRedisClient extends AdvancedRedisClient {
 			throwExceptionWhenWriteError = Boolean.parseBoolean(props.getProperty(Constants.WRITEALL_THROW_EXCEPTION_WHEN_WRITE_ERROR));
 		} else {
 			throwExceptionWhenWriteError = Constants.DEFAULT_WRITEALL_THROW_EXCEPTION_WHEN_WRITE_ERROR;
+		}
+		
+		if (Utils.isNotBlank(props.getProperty(Constants.WRITEALL_ASYNC_WRITE))) {
+			asyncWrite = Boolean.parseBoolean(props.getProperty(Constants.WRITEALL_ASYNC_WRITE));
+		} else {
+			asyncWrite = Constants.DEFAULT_WRITEALL_ASYNC_WRITE;
 		}
 		
 		if (Utils.isNotBlank(props.getProperty(Constants.WRITEALL_THREAD_POOL))) {
@@ -109,7 +115,7 @@ public class WriteAllReadAnyRedisClient extends AdvancedRedisClient {
 		if (maxByteSize > 0 && valueByes.length >= maxByteSize) {
 			throw new RedisException("不能超过" + maxByteSize + "字节");
 		}
-		String btn = FAILURE;
+		String btn = Constants.REPLY_CODE_OK;
 		Map<String, Future<String>> futures = null;
 		for (int index = 0; index < servers.size(); index++) {
 			final String server = servers.get(index);
@@ -128,7 +134,7 @@ public class WriteAllReadAnyRedisClient extends AdvancedRedisClient {
 				futures.put(server, f);
 			}
 		}
-		if (futures != null) {
+		if (!asyncWrite && futures != null) {
 			for (Entry<String, Future<String>> entry : futures.entrySet()) {
 				Future<String> f = entry.getValue();
 				try {
@@ -142,7 +148,7 @@ public class WriteAllReadAnyRedisClient extends AdvancedRedisClient {
 	}
 	
 	private String _setBytes(String server, byte[] keyBytes, byte[] valueByes) {
-		String btn = FAILURE;
+		String btn = Constants.REPLY_CODE_OK;
 		Jedis jedis = null;
 		try {
 			jedis = getManager().getJedis(server);
@@ -234,7 +240,7 @@ public class WriteAllReadAnyRedisClient extends AdvancedRedisClient {
 				futures.put(server, f);
 			}
 		}
-		if (futures != null) {
+		if (!asyncWrite && futures != null) {
 			for (Entry<String, Future<Long>> entry : futures.entrySet()) {
 				Future<Long> f = entry.getValue();
 				try {
@@ -292,7 +298,7 @@ public class WriteAllReadAnyRedisClient extends AdvancedRedisClient {
 		if (servers == null || servers.size() == 0) {
 			throw new RedisException("无可用的redis服务器");
 		}
-		String btn = FAILURE;
+		String btn = Constants.REPLY_CODE_OK;
 		Map<String, Future<String>> futures = null;
 		for (int index = 0; index < servers.size(); index++) {
 			final String server = servers.get(index);
@@ -311,7 +317,7 @@ public class WriteAllReadAnyRedisClient extends AdvancedRedisClient {
 				futures.put(server, f);
 			}
 		}
-		if (futures != null) {
+		if (!asyncWrite && futures != null) {
 			for (Entry<String, Future<String>> entry : futures.entrySet()) {
 				Future<String> f = entry.getValue();
 				try {
@@ -325,7 +331,7 @@ public class WriteAllReadAnyRedisClient extends AdvancedRedisClient {
 	}
 	
 	private String _flushDB(String server) {
-		String btn = FAILURE;
+		String btn = Constants.REPLY_CODE_OK;
 		Jedis jedis = null;
 		try {
 			jedis = getManager().getJedis(server);
@@ -388,7 +394,7 @@ public class WriteAllReadAnyRedisClient extends AdvancedRedisClient {
 				futures.put(server, f);
 			}
 		}
-		if (futures != null) {
+		if (!asyncWrite && futures != null) {
 			int i = 0;
 			for (Entry<String, Future<Long>> entry : futures.entrySet()) {
 				Future<Long> f = entry.getValue();
